@@ -1,12 +1,30 @@
-import { FlatList, View } from 'react-native'
+import { useRef, useState } from 'react'
+import { FlatList, SectionList, Text, View } from 'react-native'
 
-import { Category, Header } from '@/components'
+import { Category, Header, Product } from '@/components'
 
-import { CATEGORIES } from '@/utils/data/products'
-import { useState } from 'react'
+import { CATEGORIES, MENU } from '@/utils/data/products'
 
 const Home = () => {
   const [category, setCategory] = useState(CATEGORIES[0])
+
+  const sectionListRef = useRef<SectionList>(null)
+
+  const handleCategorySelect = (selected: string) => {
+    setCategory(selected)
+
+    const sectionIndex = CATEGORIES.findIndex(
+      (category) => category === selected,
+    )
+
+    if (sectionListRef.current) {
+      sectionListRef.current.scrollToLocation({
+        animated: true,
+        sectionIndex,
+        itemIndex: 0,
+      })
+    }
+  }
 
   return (
     <View className="flex-1 pt-8">
@@ -18,14 +36,30 @@ const Home = () => {
         className="max-h-10 mt-5"
         keyExtractor={(item) => item}
         showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{ gap: 12, paddingHorizontal: 20 }}
         renderItem={({ item }) => (
           <Category
             title={item}
             isSelected={item === category}
-            onPress={() => setCategory(item)}
+            onPress={() => handleCategorySelect(item)}
           />
         )}
-        contentContainerStyle={{ gap: 12, paddingHorizontal: 20 }}
+      />
+
+      <SectionList
+        sections={MENU}
+        ref={sectionListRef}
+        className="flex-1 p-5"
+        keyExtractor={(item) => item.id}
+        stickySectionHeadersEnabled={false}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 40 }}
+        renderItem={({ item }) => <Product data={item} />}
+        renderSectionHeader={({ section: { title } }) => (
+          <Text className="text-xl text-white font-heading mt-8 mb-3">
+            {title}
+          </Text>
+        )}
       />
     </View>
   )
