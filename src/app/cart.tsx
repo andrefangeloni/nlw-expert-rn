@@ -1,5 +1,7 @@
+import { useState } from 'react'
 import { Alert, ScrollView, Text, View } from 'react-native'
 import colors from 'tailwindcss/colors'
+import { useNavigation } from 'expo-router'
 import { Feather } from '@expo/vector-icons'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
@@ -11,6 +13,9 @@ import { formatCurrency } from '@/utils'
 
 const Cart = () => {
   const cartStore = useCartStore()
+  const navigation = useNavigation()
+
+  const [address, setAddress] = useState('')
 
   const total = formatCurrency(
     cartStore.products.reduce(
@@ -29,6 +34,26 @@ const Cart = () => {
         onPress: () => cartStore.remove(product.id),
       },
     ])
+  }
+
+  const handleOrder = () => {
+    if (address.trim().length == 0) {
+      return Alert.alert('Atenção', 'Informe os dados da entrega.')
+    }
+
+    const products = cartStore.products
+      .map((product) => `\n ${product.quantity} ${product.title}`)
+      .join('')
+
+    const message = `
+      🍔 NOVO PEDIDO
+      \n Entregar em: ${address}
+      ${products}
+      \n Valor total: ${total}
+    `
+
+    cartStore.reset()
+    navigation.goBack()
   }
 
   return (
@@ -66,7 +91,11 @@ const Cart = () => {
 
             <Input
               multiline
+              blurOnSubmit
+              returnKeyType="send"
               textAlignVertical="top"
+              onChangeText={setAddress}
+              onSubmitEditing={handleOrder}
               placeholderTextColor={colors.slate[400]}
               placeholder="Informe o endereço de entrega com rua, bairro, CEP, número e complemento..."
               className="h-32 bg-slate-800 rounded-md px-4 py-3 font-body text-sm text-white"
@@ -76,7 +105,7 @@ const Cart = () => {
       </KeyboardAwareScrollView>
 
       <View className="p-5 gap-5">
-        <Button>
+        <Button onPress={handleOrder}>
           <Button.Text>Enviar pedido</Button.Text>
           <Button.Icon>
             <Feather name="arrow-right-circle" size={20} />
