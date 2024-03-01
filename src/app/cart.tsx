@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Alert, ScrollView, Text, View } from 'react-native'
+import { Alert, Linking, ScrollView, Text, View } from 'react-native'
 import colors from 'tailwindcss/colors'
 import { useNavigation } from 'expo-router'
 import { Feather } from '@expo/vector-icons'
@@ -10,6 +10,8 @@ import { Button, Header, Input, LinkButton, Product } from '@/components'
 import { ProductCartProps, useCartStore } from '@/store/cart-store'
 
 import { formatCurrency } from '@/utils'
+
+const PHONE_NUMBER = '19996196099'
 
 const Cart = () => {
   const cartStore = useCartStore()
@@ -51,6 +53,10 @@ const Cart = () => {
       ${products}
       \n Valor total: ${total}
     `
+
+    Linking.openURL(
+      `http://api.whatsapp.com/send?phone=55${PHONE_NUMBER}&text=${message}`,
+    )
 
     cartStore.reset()
     navigation.goBack()
