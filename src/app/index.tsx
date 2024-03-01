@@ -6,13 +6,13 @@ import { Category, Header, Product } from '@/components'
 
 import { useCartStore } from '@/store/cart-store'
 
-import { CATEGORIES, MENU } from '@/utils/data/products'
+import { CATEGORIES, MENU, ProductProps } from '@/utils/data/products'
 
 const Home = () => {
   const cartStore = useCartStore()
   const [category, setCategory] = useState(CATEGORIES[0])
 
-  const sectionListRef = useRef<SectionList>(null)
+  const sectionListRef = useRef<SectionList<ProductProps>>(null)
 
   const cartQuantity = cartStore.products.reduce(
     (total, product) => total + product.quantity,
